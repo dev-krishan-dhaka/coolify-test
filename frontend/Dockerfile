@@ -3,10 +3,16 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
-RUN npm ci --include=dev
 
+# Use npm install instead of npm ci (doesn't require lock file)
+RUN npm install
+
+# Copy source code
 COPY . .
+
+# Build the app
 RUN npm run build
 
 # Stage 2: Serve
