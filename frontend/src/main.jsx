@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
 function App() {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
-
   const fetchTodos = async () => {
     try {
-      const res = await fetch(`${API_URL}/todos`);
+      const res = await fetch('/api/todos');
       const data = await res.json();
       if (data.success) setTodos(data.data);
     } catch (err) {
@@ -24,10 +18,14 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
   const addTodo = async () => {
     if (!newTodo.trim()) return;
     try {
-      const res = await fetch(`${API_URL}/todos`, {
+      const res = await fetch('/api/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: newTodo })
@@ -44,7 +42,7 @@ function App() {
 
   const toggleTodo = async (id, completed) => {
     try {
-      const res = await fetch(`${API_URL}/todos/${id}`, {
+      const res = await fetch(`/api/todos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completed: !completed })
@@ -60,7 +58,7 @@ function App() {
 
   const deleteTodo = async (id) => {
     try {
-      await fetch(`${API_URL}/todos/${id}`, { method: 'DELETE' });
+      await fetch(`/api/todos/${id}`, { method: 'DELETE' });
       setTodos(todos.filter(t => t.id !== id));
     } catch (err) {
       console.error(err);
@@ -95,7 +93,7 @@ function App() {
               onChange={() => toggleTodo(todo.id, todo.completed)}
               style={styles.checkbox}
             />
-            <span style={{ ...styles.todoText, textDecoration: todo.completed ? 'line-through' : 'none', color: todo.completed ? '#999' : '#333' }}>
+            <span style={{ ...styles.todoText, textDecoration: todo.completed ? 'line-through' : 'none' }}>
               {todo.title}
             </span>
             <button onClick={() => deleteTodo(todo.id)} style={styles.deleteButton}>Delete</button>
